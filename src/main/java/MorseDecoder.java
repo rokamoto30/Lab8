@@ -45,7 +45,22 @@ public class MorseDecoder {
      */
     private static double[] binWavFilePower(final WavFile inputFile)
             throws IOException, WavFileException {
-
+        int totalBinCount = (int) Math.ceil(inputFile.getNumFrames() / BIN_SIZE);
+        double[] returnBuffer = new double[totalBinCount];
+        double[] sampleBuffer = new double[BIN_SIZE * inputFile.getNumChannels()];
+        for (int binIndex = 0; binIndex < totalBinCount; binIndex++) {
+            int framesRead = inputFile.readFrames(sampleBuffer, BIN_SIZE);
+            returnBuffer[binIndex] = 0;
+            for (int sampleCount = 0; sampleCount < sampleBuffer.length; sampleCount++) {
+                returnBuffer[binIndex] += Math.abs(sampleBuffer[sampleCount]);
+            }
+            if (framesRead < BIN_SIZE && !(binIndex == totalBinCount - 1) {
+                throw new RuntimeException("short read from WaveFile");
+            }
+        }
+        return returnBuffer;
+        }
+        
         /*
          * We should check the results of getNumFrames to ensure that they are safe to cast to int.
          */
